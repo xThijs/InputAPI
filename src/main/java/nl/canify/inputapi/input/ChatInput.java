@@ -37,20 +37,24 @@ public class ChatInput implements Listener {
 
     public void start(Player player) {
         activePlayers.add(player);
+        player.sendMessage(questions.get(0).getQuestion());
     }
 
     @EventHandler
     public void onMessage(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         if (!activePlayers.contains(player)) return;
+        event.setCancelled(true);
         if (event.getMessage().equalsIgnoreCase("cancel")) {
             onCancel.accept(player);
             activePlayers.remove(player);
             return;
         }
+
         Question question = questions.get(0);
         question.onAnswer.accept(player, event.getMessage());
-        questions.remove(0);
+        if (!question.isUnlimited()) {questions.remove(0);}
+
         if (questions.isEmpty()) {
             onFinish.accept(player);
             activePlayers.remove(player);
