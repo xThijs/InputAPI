@@ -1,6 +1,9 @@
 # InputAPI
 A stand alone alternative for Spigot's Conversation API made for my other plugins.
 
+## Disclaimer
+Feel free to use the code for your own API or use the API itself. Keep in mind this is NOT meant for public use (right now, might change later) since I will mostly use this for my own plugins and change the the way it works whenever needed.
+
 ## Example
 ```java
 ChatInput input = new InputBuilder()
