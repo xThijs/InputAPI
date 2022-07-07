@@ -24,6 +24,7 @@ public class ChatInput implements Listener {
     private final List<Question> questions;
 
     private final List<Player> activePlayers;
+    private boolean enabled;
 
     public ChatInput(int expiry, Consumer<Player> onCancel, Consumer<Player> onExpire, Consumer<Player> onFinish, List<Question> questions) {
         this.expiry = expiry;
@@ -31,13 +32,18 @@ public class ChatInput implements Listener {
         this.onExpire = onExpire;
         this.onFinish = onFinish;
         this.questions = questions;
+        enabled = false;
         activePlayers = new ArrayList<>();
-        InputAPI.getPlugin().getServer().getPluginManager().registerEvents(this, InputAPI.getPlugin());
     }
 
     public void start(Player player) {
         activePlayers.add(player);
         player.sendMessage(questions.get(0).getQuestion());
+
+        if (!enabled) {
+            InputAPI.getPlugin().getServer().getPluginManager().registerEvents(this, InputAPI.getPlugin());
+            enabled = true;
+        }
     }
 
     @EventHandler
