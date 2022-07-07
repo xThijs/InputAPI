@@ -50,7 +50,6 @@ public class ChatInput implements Listener {
             activePlayers.remove(player);
             return;
         }
-
         Question question = questions.get(0);
         question.onAnswer.accept(player, event.getMessage());
         if (!question.isUnlimited()) {questions.remove(0);}
