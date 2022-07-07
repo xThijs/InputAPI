@@ -1,0 +1,6 @@
+name: InputAPI
+version: '${project.version}'
+main: nl.canify.inputapi.InputAPI
+api-version: 1.19
+authors: [ Canify ]
+description: A stand alone alternative for Spigot's Conversation API.
