@@ -71,15 +71,19 @@ public class ChatInput implements Listener {
         if (event.getMessage().equalsIgnoreCase("cancel") || event.getMessage().equalsIgnoreCase("stop")) {
             onCancel.accept(player);
             activePlayers.remove(player);
+            expiryMap.get(player).cancel();
+            expiryMap.remove(player);
             return;
         }
         Question question = questions.get(0);
         question.onAnswer.accept(player, event.getMessage());
-        if (!question.isUnlimited()) {questions.remove(0);}
+        if (!question.isUnlimited()) { questions.remove(0); }
 
         if (questions.isEmpty() || event.getMessage().equalsIgnoreCase("finish")) {
             onFinish.accept(player);
             activePlayers.remove(player);
+            expiryMap.get(player).cancel();
+            expiryMap.remove(player);
         }
     }
 }
