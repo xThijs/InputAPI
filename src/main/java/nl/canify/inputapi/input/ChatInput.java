@@ -2,10 +2,12 @@ package nl.canify.inputapi.input;
 
 import nl.canify.inputapi.InputAPI;
 import nl.canify.inputapi.question.Question;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Consumer;
@@ -23,8 +25,9 @@ public class ChatInput implements Listener {
     private final Consumer<Player> onFinish;
     private final List<Question> questions;
 
-    private final List<Player> activePlayers;
     private boolean enabled;
+    private final List<Player> activePlayers;
+    private final Map<Player, BukkitTask> expiryMap;
 
     public ChatInput(int expiry, Consumer<Player> onCancel, Consumer<Player> onExpire, Consumer<Player> onFinish, List<Question> questions) {
         this.expiry = expiry;
@@ -33,6 +36,7 @@ public class ChatInput implements Listener {
         this.onFinish = onFinish;
         this.questions = questions;
         enabled = false;
+        expiryMap = new HashMap<>();
         activePlayers = new ArrayList<>();
     }
 
@@ -44,6 +48,19 @@ public class ChatInput implements Listener {
             InputAPI.getPlugin().getServer().getPluginManager().registerEvents(this, InputAPI.getPlugin());
             enabled = true;
         }
+
+        expiryMap.put(player, Bukkit.getScheduler().runTaskLater(InputAPI.getPlugin(), () -> {
+            onExpire.accept(player);
+            activePlayers.remove(player);
+        }, expiry * 20L));
+
+    }
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        if (!activePlayers.contains(player)) return;
+        activePlayers.remove(player);
     }
 
     @EventHandler
@@ -51,7 +68,7 @@ public class ChatInput implements Listener {
         Player player = event.getPlayer();
         if (!activePlayers.contains(player)) return;
         event.setCancelled(true);
-        if (event.getMessage().equalsIgnoreCase("cancel")) {
+        if (event.getMessage().equalsIgnoreCase("cancel") || event.getMessage().equalsIgnoreCase("stop")) {
             onCancel.accept(player);
             activePlayers.remove(player);
             return;
