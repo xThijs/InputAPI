@@ -79,7 +79,7 @@ public class ChatInput implements Listener {
         question.onAnswer.accept(player, event.getMessage());
         if (!question.isUnlimited()) { questions.remove(0); }
 
-        if (questions.isEmpty() || event.getMessage().equalsIgnoreCase("finish")) {
+        if (questions.size() == 0 || event.getMessage().equalsIgnoreCase("finish")) {
             onFinish.accept(player);
             activePlayers.remove(player);
             expiryMap.get(player).cancel();
